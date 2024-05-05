@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Smart Contract Hash Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Exo:400,700");
+
+      * {
+        margin: 0px;
+        padding: 0px;
+      }
+
+      body {
+        font-family: "Exo", sans-serif;
+      }
+
+      .context {
+        width: 100%;
+        position: absolute;
+      }
+
+      .context h1 {
+        text-align: center;
+        color: #fff;
+        font-size: 50px;
+      }
+
+      .area {
+        background: #1a1a1c;
+        background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);
+        width: 100%;
+        height: 100vh;
+      }
+
+      .circles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .circles li {
+        position: absolute;
+        display: block;
+        list-style: none;
+        width: 20px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        animation: animate 25s linear infinite;
+        bottom: -150px;
+      }
+
+      .circles li:nth-child(1) {
+        left: 25%;
+        width: 80px;
+        height: 80px;
+        animation-delay: 0s;
+      }
+
+      .circles li:nth-child(2) {
+        left: 10%;
+        width: 20px;
+        height: 20px;
+        animation-delay: 2s;
+        animation-duration: 12s;
+      }
+
+      .circles li:nth-child(3) {
+        left: 70%;
+        width: 20px;
+        height: 20px;
+        animation-delay: 4s;
+      }
+
+      .circles li:nth-child(4) {
+        left: 40%;
+        width: 60px;
+        height: 60px;
+        animation-delay: 0s;
+        animation-duration: 18s;
+      }
+
+      .circles li:nth-child(5) {
+        left: 65%;
+        width: 20px;
+        height: 20px;
+        animation-delay: 0s;
+      }
+
+      .circles li:nth-child(6) {
+        left: 75%;
+        width: 110px;
+        height: 110px;
+        animation-delay: 3s;
+      }
+
+      .circles li:nth-child(7) {
+        left: 35%;
+        width: 150px;
+        height: 150px;
+        animation-delay: 7s;
+      }
+
+      .circles li:nth-child(8) {
+        left: 50%;
+        width: 25px;
+        height: 25px;
+        animation-delay: 15s;
+        animation-duration: 45s;
+      }
+
+      .circles li:nth-child(9) {
+        left: 20%;
+        width: 15px;
+        height: 15px;
+        animation-delay: 2s;
+        animation-duration: 35s;
+      }
+
+      .circles li:nth-child(10) {
+        left: 85%;
+        width: 150px;
+        height: 150px;
+        animation-delay: 0s;
+        animation-duration: 11s;
+      }
+
+      @keyframes animate {
+        0% {
+          transform: translateY(0) rotate(0deg);
+          opacity: 1;
+          border-radius: 0;
+        }
+
+        100% {
+          transform: translateY(-1000px) rotate(720deg);
+          opacity: 0;
+          border-radius: 50%;
+        }
+      }
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background-color: black;
+        color: white;
+      }
+      .content {
+        margin-top: 20px;
+      }
+      input,
+      button {
+        padding: 8px;
+        margin: 5px;
+      }
+      h2 {
+        margin-top: 20px;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        margin-bottom: 5px;
+      }
+      .container content {
+        top: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="text-center">Smart Contract Hash Manager</h1>
+    <div class="context">
+      <div class="container content">
+        <div class="row">
+          <div class="col-md-6">
+            <h2>Add a New Hash</h2>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="hashInput"
+                placeholder="Enter data to hash"
+              />
+            </div>
+            <button class="btn btn-primary" onclick="addNewHash()">
+              Add Hash
+            </button>
+
+            <h2>Check if Hash is Stored</h2>
+            <div class="form-group">
+              <input
+                type="text"
+                class="form-control"
+                id="checkHashInput"
+                placeholder="Enter hash to check"
+              />
+            </div>
+            <button class="btn btn-primary" onclick="checkHash()">
+              Check Hash
+            </button>
+            <p id="checkResult"></p>
+
+            <h2>All Stored Hashes</h2>
+            <button class="btn btn-primary" onclick="getAllHashes()">
+              Get Stored Hashes
+            </button>
+            <ul id="storedHashesList"></ul>
+          </div>
+          <div class="col-md-6">
+            <img
+              src="background_image.png"
+              class="img-fluid"
+              alt="Your Image"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="area">
+      <ul class="circles">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </div>
+
+    <script>
+      // Initialize Web3 with MetaMask
+      const web3 = new Web3(window.ethereum);
+
+      // Request account access
+      window.ethereum
+        .request({ method: "eth_requestAccounts" })
+        .then(() => console.log("MetaMask connected"))
+        .catch((err) => console.error("MetaMask connection error:", err));
+
+      // Contract ABI and Address (ensure these are correct)
+      const contractAbi = [
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "hash",
+              type: "bytes32",
+            },
+          ],
+          name: "addHash",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32[]",
+              name: "hashes",
+              type: "bytes32[]",
+            },
+          ],
+          name: "addHashes",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "bytes32",
+              name: "hash",
+              type: "bytes32",
+            },
+          ],
+          name: "HashAdded",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "getStoredHashes",
+          outputs: [
+            {
+              internalType: "bytes32[]",
+              name: "",
+              type: "bytes32[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "bytes32",
+              name: "hash",
+              type: "bytes32",
+            },
+          ],
+          name: "isHashStored",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "storedHashes",
+          outputs: [
+            {
+              internalType: "bytes32",
+              name: "",
+              type: "bytes32",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ];
+      const contractAddress = "0x36f17CE038FdB484006Da0F7C797009DFfC6A0bE"; // Replace with correct address
+
+      const hashManagerContract = new web3.eth.Contract(
+        contractAbi,
+        contractAddress
+      );
+
+      // Get the current Ethereum account
+      async function getAccount() {
+        const accounts = await web3.eth.getAccounts();
+        return accounts[0];
+      }
+
+      // Add a new hash
+      async function addNewHash() {
+        try {
+          const data = document.getElementById("hashInput").value;
+          const hash = web3.utils.sha3(data); // Create the hash
+
+          const account = await getAccount(); // Get current Ethereum account
+          await hashManagerContract.methods
+            .addHash(hash)
+            .send({ from: account });
+
+          alert("Hash added!"); // Confirmation
+        } catch (error) {
+          console.error("Error adding hash:", error); // Error handling
+        }
+      }
+
+      // Check if a hash is stored
+      async function checkHash() {
+        try {
+          const hash = document.getElementById("checkHashInput").value;
+
+          const isStored = await hashManagerContract.methods
+            .isHashStored(hash)
+            .call();
+          const resultText = isStored
+            ? "Hash is stored."
+            : "Hash is not stored.";
+
+          document.getElementById("checkResult").innerText = resultText; // Update the UI
+        } catch (error) {
+          console.error("Error checking hash:", error);
+        }
+      }
+
+      // Get all stored hashes
+      async function getAllHashes() {
+        try {
+          const storedHashes = await hashManagerContract.methods
+            .getStoredHashes()
+            .call();
+          const list = document.getElementById("storedHashesList");
+
+          list.innerHTML = ""; // Clear existing list
+
+          storedHashes.forEach((hash) => {
+            const listItem = document.createElement("li");
+            listItem.textContent = hash;
+            list.appendChild(listItem);
+          });
+        } catch (error) {
+          console.error("Error getting stored hashes:", error);
+        }
+      }
+    </script>
+  </body>
+</html>
